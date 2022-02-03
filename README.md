@@ -1,4 +1,4 @@
-# kiranawala
+# retailstore
 This is  service to monitor the storage of the products in retail store and a sample project build with DjangoREST framework.
 
 # running
