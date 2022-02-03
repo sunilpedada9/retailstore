@@ -3,7 +3,7 @@ This is  service to monitor the storage of the products in retail store and a sa
 
 # running
 	git clone https://github.com/sunilpedada9/retailstore.git
-	cd kiranawala
+	cd retailstore
 	pip install -r requirements.txt
 	python manage.py migrate
 	python manage.py runserver
