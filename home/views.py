@@ -5,4 +5,4 @@ from django.http import JsonResponse
 
 # Home url
 def home_view(request):
-    return JsonResponse({"message":"Welcome to the Kiranawala API service."})
+    return JsonResponse({"message":"Welcome to the Retail store API service."})
