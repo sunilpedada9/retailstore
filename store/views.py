@@ -2,13 +2,13 @@ from django.shortcuts import render
 from rest_framework.generics import CreateAPIView, RetrieveAPIView,UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from store import item_serializer
+from store import product_serializer
 from store import category_serializer
 from store.category_serializer import CategorySerializer
-from store.item_serializer import ItemSerializer
+from store.product_serializer import ProductSerializer
 from store.rack_serializer import RackSerializer
 from helper.utils import get_pagination
-from .models import Category, Item, Rack
+from .models import Category, Product, Rack
 from django.db.models import Q
 from rest_framework import serializers, status
 # Create your views here.
@@ -63,9 +63,9 @@ class CategoryListAndRemove(APIView):
         except Category.DoesNotExist:
             return Response({"message":"Category not exist!."},status=status.HTTP_200_OK)
         
-# Add items
+# Add products
 class CreateItem(CreateAPIView):
-    serializer_class=ItemSerializer
+    serializer_class=ProductSerializer
 
 # List,update and remove item
 class ListUpdateRemoveItem(APIView):
@@ -74,10 +74,10 @@ class ListUpdateRemoveItem(APIView):
         sort_type=self.request.GET.get("sort_type")
         per_page_rows=self.request.GET.get("per_page_items")
         page_no=self.request.GET.get("page_no")
-        item_name=self.request.GET.get("item_name")
+        product_name=self.request.GET.get("product_name")
         search=''
-        if item_name:
-            search+=' and item_name={}'.format(item_name)
+        if product_name:
+            search+=' and product_name={}'.format(product_name)
         if sort_by:
             search+=' order by {}'.format(sort_by)
         if not sort_by:
@@ -96,48 +96,48 @@ class ListUpdateRemoveItem(APIView):
         print(page_no,per_page_rows)
         pagination=get_pagination(per_page_rows=per_page_rows,page_no=page_no)
         print(pagination)
-        item_name=(~Q(status_id=3) & Q(item_name=item_name)) if item_name else (~Q(status_id=3))
+        product_name=(~Q(status_id=3) & Q(product_name=product_name)) if product_name else (~Q(status_id=3))
         sort_by=sort_by.lower() if sort_by else 'id' 
         sort_by='-' + sort_by.lower() if sort_by and sort_type and sort_type.lower()=='desc' else sort_by.lower() 
-        print("item",item_name)
+        print("product",product_name)
         print("sort",sort_by)
-        category_data=Item.objects.filter(
-            item_name
+        category_data=Product.objects.filter(
+            product_name
             ).order_by(sort_by)[pagination['offset']:pagination['offset'] + pagination['limit']]
 
         print("query",str(category_data.query))
-        # category_data=Item.objects.raw("""select * from store_item where status_id != '3'{search} 
+        # category_data=Product.objects.raw("""select * from store_item where status_id != '3'{search} 
         #                                         limit {offset},{limit};""".format(
         #                                             search=search,offset=pagination["offset"],limit=pagination["limit"]
         #                                         ))
         print(category_data)
-        serialized_data=ItemSerializer(category_data,many=True)
+        serialized_data=ProductSerializer(category_data,many=True)
         print(serialized_data.data)
         return Response(serialized_data.data,status=status.HTTP_200_OK)
         
     def put(self,request):
         try:
-            item_data=Item.objects.get(Q(id=self.request.data["id"]),~Q(status_id=3))
+            item_data=Product.objects.get(Q(id=self.request.data["id"]),~Q(status_id=3))
             print(item_data)
-            serialized_data=ItemSerializer(item_data,data=self.request.data,partial=True)
+            serialized_data=ProductSerializer(item_data,data=self.request.data,partial=True)
             serialized_data.is_valid()
             serialized_data.save()
             #print(serialized_data.errors)
             return Response(serialized_data.data,status=status.HTTP_200_OK)
-        except Item.DoesNotExist:
-            return Response({"message":"Item not exist!."},status=status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            return Response({"message":"product not exist!."},status=status.HTTP_200_OK)
         except:
             return Response({"errors":"Can't update!"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self,request):
         print(self.request)
         try:
-            item_data=Item.objects.get(Q(id=self.request.data["id"]),~Q(status_id=3))
+            item_data=Product.objects.get(Q(id=self.request.data["id"]),~Q(status_id=3))
             item_data.status_id=3
             item_data.save()
             return Response({"message":"Successfully removed."},status=status.HTTP_200_OK)
-        except Item.DoesNotExist:
-            return Response({"message":"Item not exist!."})
+        except Product.DoesNotExist:
+            return Response({"message":"Product not exist!."})
         except:
             return Response({"error":"Can't remove!."},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
