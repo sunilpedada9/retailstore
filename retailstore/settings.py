@@ -36,7 +36,7 @@ if SERVER_ENV == 'development':
     ALLOWED_HOSTS = ['*']
 else:
     DEBUG = False
-    ALLOWED_HOSTS=['dev-kiranawala.herokuapp.com']
+    ALLOWED_HOSTS=['.herokuapp.com']
     # Config heroku data base dependence
     DATABASES={}
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
